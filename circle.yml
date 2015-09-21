@@ -1,0 +1,12 @@
+dependencies:
+  pre:
+    - rm -rf ~/.go_workspace/src/github.com/sofuture/npmas
+    - mkdir -p ~/.go_workspace/src/github.com/sofuture/
+    - ln -s ~/npmas ~/.go_workspace/src/github.com/sofuture/npmas
+    - go get github.com/tools/godep
+  override:
+    - make build
+
+test:
+  override:
+    - make test
