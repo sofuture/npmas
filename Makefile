@@ -5,7 +5,6 @@ default: build
 
 build: generate
 	@godep go build -a -ldflags "-X github.com/sofuture/npmas/version.GitCommit=$$(git rev-parse HEAD)" -o $(PREFIX)/$(PROGRAM)
-	@cp $(PREFIX)/$(PROGRAM) $(GOPATH)/$(PREFIX)/$(PROGRAM) || true
 
 test: generate
 	@godep go test ./... -parallel=4 -race
