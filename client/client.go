@@ -15,6 +15,8 @@ type Client struct {
 	Ui   *ui.Ui
 }
 
+const updateHz = 1
+
 func Run(server string) int {
 	conn, err := mpd.Dial("tcp", server)
 	if err != nil {
@@ -33,12 +35,26 @@ func Run(server string) int {
 
 func (c *Client) Run() {
 	for {
+		current, err := c.Conn.CurrentSong()
+		if err != nil {
+			return
+		}
+
+		plinfo, err := c.Conn.PlaylistInfo(-1, -1)
+		if err != nil {
+			return
+		}
+
 		c.Ui.SetStatus(&view.MainView{
-			Artist:   "foo",
-			Song:     "bar",
-			Playlist: []string{"foo", "bar"},
+			Artist:   current["artist"],
+			Song:     current["song"],
+			Playlist: plinfo,
 			Time:     time.Now(),
 		})
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(time.Second / updateHz)
 	}
+}
+
+func (c *Client) TogglePlay() {
+	c.Conn.Pause(false)
 }

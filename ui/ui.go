@@ -19,7 +19,6 @@ type Ui struct {
 
 func (u *Ui) getLayout() func(*gocui.Gui) error {
 	return func(g *gocui.Gui) error {
-
 		var err error
 
 		maxX, maxY := g.Size()
@@ -31,7 +30,7 @@ func (u *Ui) getLayout() func(*gocui.Gui) error {
 			if err != gocui.ErrorUnkView {
 				return err
 			}
-			u.header.BgColor = gocui.ColorRed
+			u.header.BgColor = gocui.ColorDefault
 			u.header.Frame = false
 		}
 
@@ -39,7 +38,7 @@ func (u *Ui) getLayout() func(*gocui.Gui) error {
 			if err != gocui.ErrorUnkView {
 				return err
 			}
-			u.playlist.BgColor = gocui.ColorBlue
+			u.playlist.BgColor = gocui.ColorDefault
 			u.playlist.Frame = false
 		}
 
@@ -48,7 +47,7 @@ func (u *Ui) getLayout() func(*gocui.Gui) error {
 				return err
 			}
 			u.footer.Autoscroll = true
-			u.footer.BgColor = gocui.ColorGreen
+			u.footer.BgColor = gocui.ColorDefault
 			u.footer.Frame = false
 		}
 		return nil
@@ -72,6 +71,7 @@ func (u *Ui) Run() {
 	if err := u.gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
 	}
+
 	err = u.gui.MainLoop()
 	if err != nil && err != gocui.Quit {
 		log.Panicln(err)
@@ -81,13 +81,17 @@ func (u *Ui) Run() {
 func (u *Ui) SetStatus(status *view.MainView) {
 	if u.header != nil {
 		u.header.Clear()
-		fmt.Fprintf(u.header, "%s - %s", status.Artist, status.Song)
+		if status.Artist != "" && status.Song != "" {
+			fmt.Fprintf(u.header, "%s - %s", status.Artist, status.Song)
+		} else {
+			fmt.Fprintf(u.header, "not playing")
+		}
 	}
 
 	if u.playlist != nil {
 		u.playlist.Clear()
 		for _, k := range status.Playlist {
-			fmt.Fprintf(u.playlist, "%s\n", k)
+			fmt.Fprintf(u.playlist, "%s - %s - %s\n", k["Artist"], k["Album"], k["Title"])
 		}
 	}
 
